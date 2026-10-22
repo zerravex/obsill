@@ -1,0 +1,5 @@
+# personal / generated
+config.json
+config.json.bak
+logs/
+*.zip

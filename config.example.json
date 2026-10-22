@@ -1,0 +1,13 @@
+{
+  "obsillVersion": "0.0.1",
+  "vaultRoot": "D:\\Notes\\MyVault",
+  "hotkey": "^!l",
+  "dailyNoteMode": "auto",
+  "dailyNote": {
+    "folder": "__taskir/_instances/allofmydayz",
+    "format": "YYYY-MM-DD-ddd",
+    "template": ""
+  },
+  "timeFormat": "HH:mm",
+  "entryTemplate": "- {time} {text}"
+}
