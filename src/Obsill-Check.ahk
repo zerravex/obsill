@@ -6,6 +6,7 @@
 #Include lib\ObsillLog.ahk
 #Include lib\DateFormat.ahk
 #Include lib\Config.ahk
+#Include lib\HotkeyText.ahk
 #Include lib\DailyNote.ahk
 
 ; ---------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ RunCheck(projectRoot) {
 
     try {
         Hotkey(cfg.Hotkey, (*) => 0, "Off")
-        lines.Push("[ OK ] hotkey     : " cfg.Hotkey)
+        lines.Push("[ OK ] hotkey     : " cfg.Hotkey " (" HotkeyText.Describe(cfg.Hotkey) ")")
     } catch as e {
         lines.Push("[FAIL] hotkey '" cfg.Hotkey "' is not valid: " e.Message)
         ok := false
