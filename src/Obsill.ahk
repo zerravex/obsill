@@ -6,6 +6,7 @@
 #Include lib\ObsillLog.ahk
 #Include lib\DateFormat.ahk
 #Include lib\Config.ahk
+#Include lib\HotkeyText.ahk
 #Include lib\DailyNote.ahk
 #Include lib\InputWindow.ahk
 
@@ -44,8 +45,11 @@ InputWindow.RegisterKeys()
 BuildTrayMenu()
 Persistent()
 
-ObsillLog.Info("Ready. Hotkey: " Cfg.Hotkey "  Vault: " Cfg.VaultRoot "  Mode: " Cfg.DailyNoteMode)
-TrayTip("Ready. Press " Cfg.Hotkey " to log.", "Obsill")
+; Show the hotkey as "Ctrl+Alt+L", never as the raw AutoHotkey syntax "^!l".
+HotkeyLabel := HotkeyText.Describe(Cfg.Hotkey)
+
+ObsillLog.Info("Ready. Hotkey: " Cfg.Hotkey " (" HotkeyLabel ")  Vault: " Cfg.VaultRoot "  Mode: " Cfg.DailyNoteMode)
+TrayTip("Ready. Press " HotkeyLabel " to log.", "Obsill")
 return
 
 ; ---------------------------------------------------------------------------------
@@ -78,7 +82,7 @@ BuildTrayMenu() {
     A_IconTip := "Obsill - Obsidian Life Logger"
     tray := A_TrayMenu
     tray.Delete()
-    quickLabel := "Quick log (" Cfg.Hotkey ")"
+    quickLabel := "Quick log (" HotkeyLabel ")"
     tray.Add(quickLabel, (*) => OnHotkey())
     tray.Add("Run self-check", (*) => Run('"' A_AhkPath '" "' A_ScriptDir '\Obsill-Check.ahk"'))
     tray.Add("Open logs folder", (*) => Run('explorer.exe "' LogDir '"'))

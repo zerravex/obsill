@@ -6,6 +6,7 @@
 #Include ..\src\lib\ObsillLog.ahk
 #Include ..\src\lib\DateFormat.ahk
 #Include ..\src\lib\Config.ahk
+#Include ..\src\lib\HotkeyText.ahk
 #Include ..\src\lib\DailyNote.ahk
 
 ; Unit tests for the pure logic: date format converter, JSON reader, folder
@@ -103,6 +104,20 @@ Check("entry: CRLF input", DailyNote.BuildEntry(T, "14:32", "a`r`nb"), "- 14:32 
 Check("entry: text is not re-expanded", DailyNote.BuildEntry(T, "09:00", "use {time} here"), "- 09:00 use {time} here")
 Check("entry: no list marker, no indent", DailyNote.BuildEntry("{time} {text}", "14:32", "x`ny"), "14:32 x`ny")
 Check("entry: numbered list indent", DailyNote.BuildEntry("1. {time} {text}", "14:32", "x`ny"), "1. 14:32 x`n   y")
+
+; ---- HotkeyText: raw AutoHotkey syntax -> readable text -----------------------------
+Check("hotkey: default ^!l", HotkeyText.Describe("^!l"), "Ctrl+Alt+L")
+Check("hotkey: order does not matter", HotkeyText.Describe("!^+d"), "Ctrl+Alt+Shift+D")
+Check("hotkey: win key", HotkeyText.Describe("#j"), "Win+J")
+Check("hotkey: no modifier", HotkeyText.Describe("F7"), "F7")
+Check("hotkey: named key", HotkeyText.Describe("^Enter"), "Ctrl+Enter")
+Check("hotkey: space key", HotkeyText.Describe("^!Space"), "Ctrl+Alt+Space")
+Check("hotkey: digit", HotkeyText.Describe("^3"), "Ctrl+3")
+Check("hotkey: bar is the vertical bar key", HotkeyText.Describe("^!|"), "Ctrl+Alt+Vertical bar")
+Check("hotkey: grave accent", HotkeyText.Describe("^`"), "Ctrl+Grave accent")
+Check("hotkey: mouse button", HotkeyText.Describe("^MButton"), "Ctrl+Middle mouse button")
+Check("hotkey: unknown char kept as typed", HotkeyText.Describe("^!["), "^![Left square bracket")
+Check("hotkey: repeated modifier falls back to raw", HotkeyText.Describe("^^a"), "^^a")
 
 ; ---- report -------------------------------------------------------------------------
 report := Results.passed " passed, " Results.failed.Length " failed."

@@ -92,6 +92,35 @@ function Get-ObsillVersion {
     return 'unknown'
 }
 
+function ConvertTo-HotkeyText {
+    param([Parameter(Mandatory)][string]$Raw)
+    # Same mapping as src\lib\HotkeyText.ahk; anything unknown falls back to $Raw.
+    $modMap = [ordered]@{ '^' = 'Ctrl'; '!' = 'Alt'; '+' = 'Shift'; '#' = 'Win' }
+    $mods = New-Object System.Collections.Generic.List[string]
+    $i = 0
+    while ($i -lt $Raw.Length) {
+        $c = $Raw[$i]
+        if (-not $modMap.Contains([string]$c)) { break }
+        if ($mods.Contains($modMap[[string]$c])) { break }   # repeated modifier: not a plain prefix
+        $mods.Add($modMap[[string]$c])
+        $i++
+    }
+    $rest = $Raw.Substring($i)
+    $key = ''
+    if ($rest -ne '') {
+        if ($rest -match '^[A-Za-z]$') { $key = $rest.ToUpper() }
+        elseif ($rest -match '^[0-9]$') { $key = $rest }
+        elseif ($rest -eq ' ') { $key = 'Space' }
+        elseif ($rest -match '^(F\d+|Numpad\d+|[A-Za-z]+)$') { $key = $rest.Substring(0,1).ToUpper() + $rest.Substring(1) }
+        else { return $Raw }                                  # not recognised: show the raw string
+    }
+    $parts = New-Object System.Collections.Generic.List[string]
+    foreach ($name in @('Ctrl', 'Alt', 'Shift', 'Win')) { if ($mods.Contains($name)) { $parts.Add($name) } }
+    if ($key -ne '') { $parts.Add($key) }
+    if ($parts.Count -eq 0) { return $Raw }
+    return ($parts -join '+')
+}
+
 function Read-JsonFile {
     param([Parameter(Mandatory)][string]$Path)
     $raw = [System.IO.File]::ReadAllText($Path)    # detects and strips a BOM
@@ -443,7 +472,12 @@ try {
         }
         if (Read-YesNo 'Start Obsill now?' $true) {
             Start-Process -FilePath $ahkExe -ArgumentList ('"' + $AhkMain + '"') -WorkingDirectory $ProjectRoot
-            Write-Say "Obsill is running. Press $hotkey to log." 'OK'
+            $hotkeyText = ConvertTo-HotkeyText $hotkey
+            if ($hotkeyText -ne $hotkey) {
+                Write-Say "Obsill is running. Press $hotkeyText to log." 'OK'
+            } else {
+                Write-Say "Obsill is running. Press $hotkey to log." 'OK'
+            }
         }
     }
     elseif ($ahkExe -and ($checkPassed -eq $false)) {
